@@ -23,7 +23,7 @@ import ListItemText from "@mui/material/ListItemText";
 // Import custom components
 import BarCharts from "./BarCharts";
 import Loader from "./Loader";
-import { ListItemButton } from "@mui/material";
+import { ListItemButton, Tabs, Tab } from "@mui/material";
 
 const drawerWidth = 240;
 // List of GitHub repositories
@@ -90,54 +90,56 @@ export default function Home() {
   and updates the value of gitHubrepo data.
   */
   const [githubRepoData, setGithubData] = useState([]);
+  // Add a new state for managing active tab
+  const [activeTab, setActiveTab] = useState("issues");
+
   // Updates the repository to newly selected repository
   const eventHandler = (repo) => {
     setRepository(repo);
   };
 
-  /* 
-  Fetch the data from flask microservice on Component load and on update of new repository.
-  Everytime there is a change in a repository, useEffect will get triggered, useEffect inturn will trigger 
-  the flask microservice 
-  */
-  React.useEffect(() => {
-    // set loading to true to display loader
+  // Handle tab change
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+    fetchData(newValue);
+  };
+
+  // Separate function to fetch data
+  const fetchData = (dataType) => {
     setLoading(true);
     const requestOptions = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      // Append the repository key to request body
-      body: JSON.stringify({ repository: repository.key }),
+      // Include both repository and dataType in the request
+      body: JSON.stringify({
+        repository: repository.key,
+        dataType: dataType,
+      }),
     };
 
-    /*
-    Fetching the GitHub details from flask microservice
-    The route "/api/github" is served by Flask/App.py in the line 53
-    @app.route('/api/github', methods=['POST'])
-    Which is routed by setupProxy.js to the
-    microservice target: "your_flask_gcloud_url"
-    */
     fetch("/api/github", requestOptions)
       .then((res) => res.json())
       .then(
-        // On successful response from flask microservice
         (result) => {
-          // On success set loading to false to display the contents of the resonse
           setLoading(false);
-          // Set state on successfull response from the API
           setGithubData(result);
         },
-        // On failure from flask microservice
         (error) => {
-          // Set state on failure response from the API
           console.log(error);
-          // On failure set loading to false to display the error message
           setLoading(false);
           setGithubData([]);
         }
       );
+  };
+
+  /* 
+  Fetch the data from flask microservice on Component load and on update of new repository.
+  Now we also specify which data type to fetch (issues or pulls)
+  */
+  React.useEffect(() => {
+    fetchData(activeTab);
   }, [repository]);
 
   return (
@@ -150,7 +152,7 @@ export default function Home() {
       >
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
-            Timeseries Forecasting V2
+            Timeseries Forecasting V3
           </Typography>
         </Toolbar>
       </AppBar>
@@ -187,117 +189,190 @@ export default function Home() {
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Toolbar />
+
+        {/* Add tabs for different data types */}
+        <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>
+          <Tab label="Issues" value="issues" />
+          <Tab label="Pull Requests" value="pulls" />
+          {/* Add more tabs here in the future if needed */}
+        </Tabs>
+
         {/* Render loader component if loading is true else render charts and images */}
         {loading ? (
           <Loader />
         ) : (
           <div>
-            {/* Render barchart component for a monthly created issues for a selected repositories*/}
-            <BarCharts
-              title={`Monthly Created Issues for ${repository.value} in last 1 year`}
-              data={githubRepoData?.created}
-            />
-            {/* Render barchart component for a monthly created issues for a selected repositories*/}
-            <BarCharts
-              title={`Monthly Closed Issues for ${repository.value} in last 1 year`}
-              data={githubRepoData?.closed}
-            />
-            <Divider
-              sx={{ borderBlockWidth: "3px", borderBlockColor: "#FFA500" }}
-            />
-            {/* Rendering Timeseries Forecasting of Created Issues using Tensorflow and
-                Keras LSTM */}
-            <div>
-              <Typography variant="h5" component="div" gutterBottom>
-                Timeseries Forecasting of Created Issues using Tensorflow and
-                Keras LSTM based on past month
-              </Typography>
+            {/* Show Issues tab content */}
+            {activeTab === "issues" && (
+              <div>
+                {/* Render barchart component for monthly created issues */}
+                <BarCharts
+                  title={`Monthly Created Issues for ${repository.value} in last 1 year`}
+                  data={githubRepoData?.created}
+                />
+                {/* Render barchart component for monthly closed issues */}
+                <BarCharts
+                  title={`Monthly Closed Issues for ${repository.value} in last 1 year`}
+                  data={githubRepoData?.closed}
+                />
+                <Divider
+                  sx={{ borderBlockWidth: "3px", borderBlockColor: "#FFA500" }}
+                />
+                {/* Rendering Timeseries Forecasting of Created Issues */}
+                <div>
+                  <Typography variant="h5" component="div" gutterBottom>
+                    Timeseries Forecasting of Created Issues using Tensorflow
+                    and Keras LSTM based on past month
+                  </Typography>
 
-              <div>
-                <Typography component="h4">
-                  Model Loss for Created Issues
-                </Typography>
-                {/* Render the model loss image for created issues */}
-                <img
-                  src={githubRepoData?.createdAtImageUrls?.model_loss_image_url}
-                  alt={"Model Loss for Created Issues"}
-                  loading={"lazy"}
-                />
-              </div>
-              <div>
-                <Typography component="h4">
-                  LSTM Generated Data for Created Issues
-                </Typography>
-                {/* Render the LSTM generated image for created issues*/}
-                <img
-                  src={
-                    githubRepoData?.createdAtImageUrls?.lstm_generated_image_url
-                  }
-                  alt={"LSTM Generated Data for Created Issues"}
-                  loading={"lazy"}
-                />
-              </div>
-              <div>
-                <Typography component="h4">
-                  All Issues Data for Created Issues
-                </Typography>
-                {/* Render the all issues data image for created issues*/}
-                <img
-                  src={
-                    githubRepoData?.createdAtImageUrls?.all_issues_data_image
-                  }
-                  alt={"All Issues Data for Created Issues"}
-                  loading={"lazy"}
-                />
-              </div>
-            </div>
-            {/* Rendering Timeseries Forecasting of Closed Issues using Tensorflow and
-                Keras LSTM  */}
-            <div>
-              <Divider
-                sx={{ borderBlockWidth: "3px", borderBlockColor: "#FFA500" }}
-              />
-              <Typography variant="h5" component="div" gutterBottom>
-                Timeseries Forecasting of Closed Issues using Tensorflow and
-                Keras LSTM based on past month
-              </Typography>
+                  <div>
+                    <Typography component="h4">
+                      Model Loss for Created Issues
+                    </Typography>
+                    <img
+                      src={
+                        githubRepoData?.createdAtImageUrls?.model_loss_image_url
+                      }
+                      alt={"Model Loss for Created Issues"}
+                      loading={"lazy"}
+                    />
+                  </div>
+                  <div>
+                    <Typography component="h4">
+                      LSTM Generated Data for Created Issues
+                    </Typography>
+                    <img
+                      src={
+                        githubRepoData?.createdAtImageUrls
+                          ?.lstm_generated_image_url
+                      }
+                      alt={"LSTM Generated Data for Created Issues"}
+                      loading={"lazy"}
+                    />
+                  </div>
+                  <div>
+                    <Typography component="h4">
+                      All Issues Data for Created Issues
+                    </Typography>
+                    <img
+                      src={
+                        githubRepoData?.createdAtImageUrls
+                          ?.all_issues_data_image
+                      }
+                      alt={"All Issues Data for Created Issues"}
+                      loading={"lazy"}
+                    />
+                  </div>
+                </div>
+                {/* Rendering Timeseries Forecasting of Closed Issues */}
+                <div>
+                  <Divider
+                    sx={{
+                      borderBlockWidth: "3px",
+                      borderBlockColor: "#FFA500",
+                    }}
+                  />
+                  <Typography variant="h5" component="div" gutterBottom>
+                    Timeseries Forecasting of Closed Issues using Tensorflow and
+                    Keras LSTM based on past month
+                  </Typography>
 
-              <div>
-                <Typography component="h4">
-                  Model Loss for Closed Issues
-                </Typography>
-                {/* Render the model loss image for closed issues  */}
-                <img
-                  src={githubRepoData?.closedAtImageUrls?.model_loss_image_url}
-                  alt={"Model Loss for Closed Issues"}
-                  loading={"lazy"}
-                />
+                  <div>
+                    <Typography component="h4">
+                      Model Loss for Closed Issues
+                    </Typography>
+                    <img
+                      src={
+                        githubRepoData?.closedAtImageUrls?.model_loss_image_url
+                      }
+                      alt={"Model Loss for Closed Issues"}
+                      loading={"lazy"}
+                    />
+                  </div>
+                  <div>
+                    <Typography component="h4">
+                      LSTM Generated Data for Closed Issues
+                    </Typography>
+                    <img
+                      src={
+                        githubRepoData?.closedAtImageUrls
+                          ?.lstm_generated_image_url
+                      }
+                      alt={"LSTM Generated Data for Closed Issues"}
+                      loading={"lazy"}
+                    />
+                  </div>
+                  <div>
+                    <Typography component="h4">
+                      All Issues Data for Closed Issues
+                    </Typography>
+                    <img
+                      src={
+                        githubRepoData?.closedAtImageUrls?.all_issues_data_image
+                      }
+                      alt={"All Issues Data for Closed Issues"}
+                      loading={"lazy"}
+                    />
+                  </div>
+                </div>
               </div>
+            )}
+
+            {/* Show Pull Requests tab content */}
+            {activeTab === "pulls" && (
               <div>
-                <Typography component="h4">
-                  LSTM Generated Data for Closed Issues
-                </Typography>
-                {/* Render the LSTM generated image for closed issues */}
-                <img
-                  src={
-                    githubRepoData?.closedAtImageUrls?.lstm_generated_image_url
-                  }
-                  alt={"LSTM Generated Data for Closed Issues"}
-                  loading={"lazy"}
+                {/* Render barchart component for pull requests */}
+                <BarCharts
+                  title={`Monthly Pull Requests for ${repository.value} in last 1 year`}
+                  data={githubRepoData?.pulls}
                 />
-              </div>
-              <div>
-                <Typography component="h4">
-                  All Issues Data for Closed Issues
-                </Typography>
-                {/* Render the all issues data image for closed issues*/}
-                <img
-                  src={githubRepoData?.closedAtImageUrls?.all_issues_data_image}
-                  alt={"All Issues Data for Closed Issues"}
-                  loading={"lazy"}
+                <Divider
+                  sx={{ borderBlockWidth: "3px", borderBlockColor: "#FFA500" }}
                 />
+                {/* Rendering Timeseries Forecasting of Pull Requests */}
+                <div>
+                  <Typography variant="h5" component="div" gutterBottom>
+                    Timeseries Forecasting of Pull Requests using Tensorflow and
+                    Keras LSTM based on past month
+                  </Typography>
+
+                  <div>
+                    <Typography component="h4">
+                      Model Loss for Pull Requests
+                    </Typography>
+                    <img
+                      src={githubRepoData?.pullsImageUrls?.model_loss_image_url}
+                      alt={"Model Loss for Pull Requests"}
+                      loading={"lazy"}
+                    />
+                  </div>
+                  <div>
+                    <Typography component="h4">
+                      LSTM Generated Data for Pull Requests
+                    </Typography>
+                    <img
+                      src={
+                        githubRepoData?.pullsImageUrls?.lstm_generated_image_url
+                      }
+                      alt={"LSTM Generated Data for Pull Requests"}
+                      loading={"lazy"}
+                    />
+                  </div>
+                  <div>
+                    <Typography component="h4">
+                      All Issues Data for Pull Requests
+                    </Typography>
+                    <img
+                      src={
+                        githubRepoData?.pullsImageUrls?.all_issues_data_image
+                      }
+                      alt={"All Issues Data for Pull Requests"}
+                      loading={"lazy"}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </Box>
