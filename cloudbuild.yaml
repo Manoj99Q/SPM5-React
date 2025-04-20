@@ -1,7 +1,7 @@
 steps:
   # Build the container image
   - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "gcr.io/react-assign5/react-assign5, "."]
+    args: ["build", "-t", "gcr.io/react-assign5/react-assign5", "."]
   # Push the container image to Container Registry
   - name: "gcr.io/cloud-builders/docker"
     args: ["push", "gcr.io/react-assign5/react-assign5"]
