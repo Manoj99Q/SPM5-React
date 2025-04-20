@@ -24,3 +24,7 @@ steps:
       ]
 images:
   - gcr.io/react-assign5/react-assign5
+
+# Add logging options as required when service_account is specified
+options:
+  logging: CLOUD_LOGGING_ONLY
