@@ -12,7 +12,7 @@ steps:
       [
         "run",
         "deploy",
-        "ch8-nlp-lstm",
+        "react-assign5",
         "--image",
         "gcr.io/react-assign5/react-assign5",
         "--region",
