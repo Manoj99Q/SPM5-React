@@ -29,20 +29,36 @@ const drawerWidth = 240;
 // List of GitHub repositories
 const repositories = [
   {
-    key: "angular/angular",
-    value: "Angular",
+    key: "meta-llama/llama3",
+    value: "Llama 3",
   },
   {
-    key: "angular/angular-cli",
-    value: "Angular-cli",
+    key: "ollama/ollama",
+    value: "Ollama",
   },
   {
-    key: "angular/material",
-    value: "Angular Material",
+    key: "langchain-ai/langchain",
+    value: "LangChain",
   },
   {
-    key: "d3/d3",
-    value: "D3",
+    key: "langchain-ai/langgraph",
+    value: "LangGraph",
+  },
+  {
+    key: "microsoft/autogen",
+    value: "Microsoft AutoGen",
+  },
+  {
+    key: "openai/openai-cookbook",
+    value: "OpenAI Cookbook",
+  },
+  {
+    key: "elastic/elasticsearch",
+    value: "Elasticsearch",
+  },
+  {
+    key: "milvus-io/pymilvus",
+    value: "PyMilvus",
   },
 ];
 
@@ -62,8 +78,8 @@ export default function Home() {
   The repository "key" will be sent to flask microservice in a request body
   */
   const [repository, setRepository] = useState({
-    key: "angular/angular",
-    value: "Angular",
+    key: "meta-llama/llama3",
+    value: "Llama 3",
   });
   /*
   
