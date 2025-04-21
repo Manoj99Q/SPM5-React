@@ -23,7 +23,16 @@ import ListItemText from "@mui/material/ListItemText";
 // Import custom components
 import BarCharts from "./BarCharts";
 import Loader from "./Loader";
-import { ListItemButton, Tabs, Tab } from "@mui/material";
+import {
+  ListItemButton,
+  Tabs,
+  Tab,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+} from "@mui/material";
 
 const drawerWidth = 240;
 // List of GitHub repositories
@@ -92,6 +101,8 @@ export default function Home() {
   const [githubRepoData, setGithubData] = useState([]);
   // Add a new state for managing active tab
   const [activeTab, setActiveTab] = useState("issues");
+  // Add new state for model selection
+  const [forecastModel, setForecastModel] = useState("lstm");
 
   // Updates the repository to newly selected repository
   const eventHandler = (repo) => {
@@ -101,21 +112,28 @@ export default function Home() {
   // Handle tab change
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
-    fetchData(newValue);
+    fetchData(newValue, forecastModel);
+  };
+
+  // Handle model selection change
+  const handleModelChange = (event) => {
+    setForecastModel(event.target.value);
+    fetchData(activeTab, event.target.value);
   };
 
   // Separate function to fetch data
-  const fetchData = (dataType) => {
+  const fetchData = (dataType, modelType) => {
     setLoading(true);
     const requestOptions = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      // Include both repository and dataType in the request
+      // Include repository, dataType, and modelType in the request
       body: JSON.stringify({
         repository: repository.key,
         dataType: dataType,
+        modelType: modelType,
       }),
     };
 
@@ -136,10 +154,10 @@ export default function Home() {
 
   /* 
   Fetch the data from flask microservice on Component load and on update of new repository.
-  Now we also specify which data type to fetch (issues or pulls)
+  Now we also specify which data type to fetch (issues or pulls) and which model to use
   */
   React.useEffect(() => {
-    fetchData(activeTab);
+    fetchData(activeTab, forecastModel);
   }, [repository]);
 
   return (
@@ -197,6 +215,28 @@ export default function Home() {
           {/* Add more tabs here in the future if needed */}
         </Tabs>
 
+        {/* Add model selection radio buttons */}
+        <FormControl component="fieldset" sx={{ mb: 3 }}>
+          <FormLabel component="legend">Forecast Model</FormLabel>
+          <RadioGroup
+            row
+            name="forecast-model"
+            value={forecastModel}
+            onChange={handleModelChange}
+          >
+            <FormControlLabel
+              value="lstm"
+              control={<Radio />}
+              label="LSTM (Deep Learning)"
+            />
+            <FormControlLabel
+              value="statsmodel"
+              control={<Radio />}
+              label="Statsmodel (ARIMA)"
+            />
+          </RadioGroup>
+        </FormControl>
+
         {/* Render loader component if loading is true else render charts and images */}
         {loading ? (
           <Loader />
@@ -221,32 +261,41 @@ export default function Home() {
                 {/* Rendering Timeseries Forecasting of Created Issues */}
                 <div>
                   <Typography variant="h5" component="div" gutterBottom>
-                    Timeseries Forecasting of Created Issues using Tensorflow
-                    and Keras LSTM based on past month
+                    Timeseries Forecasting of Created Issues using{" "}
+                    {forecastModel === "lstm"
+                      ? "Tensorflow and Keras LSTM"
+                      : "Statsmodels ARIMA"}{" "}
+                    based on past month
                   </Typography>
 
                   <div>
                     <Typography component="h4">
-                      Model Loss for Created Issues
+                      Model {forecastModel === "lstm" ? "Loss" : "Diagnostics"}{" "}
+                      for Created Issues
                     </Typography>
                     <img
                       src={
                         githubRepoData?.createdAtImageUrls?.model_loss_image_url
                       }
-                      alt={"Model Loss for Created Issues"}
+                      alt={`Model ${
+                        forecastModel === "lstm" ? "Loss" : "Diagnostics"
+                      } for Created Issues`}
                       loading={"lazy"}
                     />
                   </div>
                   <div>
                     <Typography component="h4">
-                      LSTM Generated Data for Created Issues
+                      {forecastModel === "lstm" ? "LSTM" : "Statsmodel"}{" "}
+                      Generated Data for Created Issues
                     </Typography>
                     <img
                       src={
                         githubRepoData?.createdAtImageUrls
                           ?.lstm_generated_image_url
                       }
-                      alt={"LSTM Generated Data for Created Issues"}
+                      alt={`${
+                        forecastModel === "lstm" ? "LSTM" : "Statsmodel"
+                      } Generated Data for Created Issues`}
                       loading={"lazy"}
                     />
                   </div>
@@ -273,32 +322,41 @@ export default function Home() {
                     }}
                   />
                   <Typography variant="h5" component="div" gutterBottom>
-                    Timeseries Forecasting of Closed Issues using Tensorflow and
-                    Keras LSTM based on past month
+                    Timeseries Forecasting of Closed Issues using{" "}
+                    {forecastModel === "lstm"
+                      ? "Tensorflow and Keras LSTM"
+                      : "Statsmodels ARIMA"}{" "}
+                    based on past month
                   </Typography>
 
                   <div>
                     <Typography component="h4">
-                      Model Loss for Closed Issues
+                      Model {forecastModel === "lstm" ? "Loss" : "Diagnostics"}{" "}
+                      for Closed Issues
                     </Typography>
                     <img
                       src={
                         githubRepoData?.closedAtImageUrls?.model_loss_image_url
                       }
-                      alt={"Model Loss for Closed Issues"}
+                      alt={`Model ${
+                        forecastModel === "lstm" ? "Loss" : "Diagnostics"
+                      } for Closed Issues`}
                       loading={"lazy"}
                     />
                   </div>
                   <div>
                     <Typography component="h4">
-                      LSTM Generated Data for Closed Issues
+                      {forecastModel === "lstm" ? "LSTM" : "Statsmodel"}{" "}
+                      Generated Data for Closed Issues
                     </Typography>
                     <img
                       src={
                         githubRepoData?.closedAtImageUrls
                           ?.lstm_generated_image_url
                       }
-                      alt={"LSTM Generated Data for Closed Issues"}
+                      alt={`${
+                        forecastModel === "lstm" ? "LSTM" : "Statsmodel"
+                      } Generated Data for Closed Issues`}
                       loading={"lazy"}
                     />
                   </div>
@@ -332,29 +390,38 @@ export default function Home() {
                 {/* Rendering Timeseries Forecasting of Pull Requests */}
                 <div>
                   <Typography variant="h5" component="div" gutterBottom>
-                    Timeseries Forecasting of Pull Requests using Tensorflow and
-                    Keras LSTM based on past month
+                    Timeseries Forecasting of Pull Requests using{" "}
+                    {forecastModel === "lstm"
+                      ? "Tensorflow and Keras LSTM"
+                      : "Statsmodels ARIMA"}{" "}
+                    based on past month
                   </Typography>
 
                   <div>
                     <Typography component="h4">
-                      Model Loss for Pull Requests
+                      Model {forecastModel === "lstm" ? "Loss" : "Diagnostics"}{" "}
+                      for Pull Requests
                     </Typography>
                     <img
                       src={githubRepoData?.pullsImageUrls?.model_loss_image_url}
-                      alt={"Model Loss for Pull Requests"}
+                      alt={`Model ${
+                        forecastModel === "lstm" ? "Loss" : "Diagnostics"
+                      } for Pull Requests`}
                       loading={"lazy"}
                     />
                   </div>
                   <div>
                     <Typography component="h4">
-                      LSTM Generated Data for Pull Requests
+                      {forecastModel === "lstm" ? "LSTM" : "Statsmodel"}{" "}
+                      Generated Data for Pull Requests
                     </Typography>
                     <img
                       src={
                         githubRepoData?.pullsImageUrls?.lstm_generated_image_url
                       }
-                      alt={"LSTM Generated Data for Pull Requests"}
+                      alt={`${
+                        forecastModel === "lstm" ? "LSTM" : "Statsmodel"
+                      } Generated Data for Pull Requests`}
                       loading={"lazy"}
                     />
                   </div>
