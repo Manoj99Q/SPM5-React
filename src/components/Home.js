@@ -214,6 +214,7 @@ export default function Home() {
           <Tab label="Pull Requests" value="pulls" />
           <Tab label="Commits" value="commits" />
           <Tab label="Branches" value="branches" />
+          <Tab label="Contributors" value="contributors" />
           {/* Add more tabs here in the future if needed */}
         </Tabs>
 
@@ -648,111 +649,227 @@ export default function Home() {
                     based on past month
                   </Typography>
 
-                  {githubRepoData?.branches?.length < 50 ? (
-                    <Typography
-                      variant="subtitle1"
-                      sx={{ color: "orange", my: 3, textAlign: "center" }}
-                    >
-                      Not enough branch creation data for reliable forecasting.
-                      At least 50 data points are required, but only{" "}
-                      {githubRepoData?.branches?.length || 0} are available.
+                  <div>
+                    <Typography component="h4">
+                      Model{" "}
+                      {forecastModel === "lstm"
+                        ? "Loss"
+                        : forecastModel === "statsmodel"
+                        ? "Diagnostics"
+                        : "Diagnostics"}{" "}
+                      for Branch Creation
                     </Typography>
-                  ) : (
-                    <>
-                      <div>
-                        <Typography component="h4">
-                          Model{" "}
-                          {forecastModel === "lstm"
+                    {githubRepoData?.branchesImageUrls?.model_loss_image_url ? (
+                      <img
+                        src={
+                          githubRepoData?.branchesImageUrls
+                            ?.model_loss_image_url
+                        }
+                        alt={`Model ${
+                          forecastModel === "lstm"
                             ? "Loss"
                             : forecastModel === "statsmodel"
                             ? "Diagnostics"
-                            : "Diagnostics"}{" "}
-                          for Branch Creation
-                        </Typography>
-                        {githubRepoData?.branchesImageUrls
-                          ?.model_loss_image_url ? (
-                          <img
-                            src={
-                              githubRepoData?.branchesImageUrls
-                                ?.model_loss_image_url
-                            }
-                            alt={`Model ${
-                              forecastModel === "lstm"
-                                ? "Loss"
-                                : forecastModel === "statsmodel"
-                                ? "Diagnostics"
-                                : "Diagnostics"
-                            } for Branch Creation`}
-                            loading={"lazy"}
-                          />
-                        ) : (
-                          <Typography
-                            sx={{ fontStyle: "italic", color: "gray", my: 2 }}
-                          >
-                            Image not available. There may have been an error in
-                            the forecast generation.
-                          </Typography>
-                        )}
-                      </div>
-                      <div>
-                        <Typography component="h4">
-                          {forecastModel === "lstm"
+                            : "Diagnostics"
+                        } for Branch Creation`}
+                        loading={"lazy"}
+                      />
+                    ) : (
+                      <Typography
+                        sx={{ fontStyle: "italic", color: "gray", my: 2 }}
+                      >
+                        Image not available. There may have been an error in the
+                        forecast generation.
+                      </Typography>
+                    )}
+                  </div>
+                  <div>
+                    <Typography component="h4">
+                      {forecastModel === "lstm"
+                        ? "LSTM"
+                        : forecastModel === "statsmodel"
+                        ? "Statsmodel"
+                        : "Prophet"}{" "}
+                      Generated Data for Branch Creation
+                    </Typography>
+                    {githubRepoData?.branchesImageUrls
+                      ?.lstm_generated_image_url ? (
+                      <img
+                        src={
+                          githubRepoData?.branchesImageUrls
+                            ?.lstm_generated_image_url
+                        }
+                        alt={`${
+                          forecastModel === "lstm"
                             ? "LSTM"
                             : forecastModel === "statsmodel"
                             ? "Statsmodel"
-                            : "Prophet"}{" "}
-                          Generated Data for Branch Creation
-                        </Typography>
-                        {githubRepoData?.branchesImageUrls
-                          ?.lstm_generated_image_url ? (
-                          <img
-                            src={
-                              githubRepoData?.branchesImageUrls
-                                ?.lstm_generated_image_url
-                            }
-                            alt={`${
-                              forecastModel === "lstm"
-                                ? "LSTM"
-                                : forecastModel === "statsmodel"
-                                ? "Statsmodel"
-                                : "Prophet"
-                            } Generated Data for Branch Creation`}
-                            loading={"lazy"}
-                          />
-                        ) : (
-                          <Typography
-                            sx={{ fontStyle: "italic", color: "gray", my: 2 }}
-                          >
-                            Image not available. There may have been an error in
-                            the forecast generation.
-                          </Typography>
-                        )}
-                      </div>
-                      <div>
-                        <Typography component="h4">
-                          All Data for Branch Creation
-                        </Typography>
-                        {githubRepoData?.branchesImageUrls
-                          ?.all_issues_data_image ? (
-                          <img
-                            src={
-                              githubRepoData?.branchesImageUrls
-                                ?.all_issues_data_image
-                            }
-                            alt={"All Data for Branch Creation"}
-                            loading={"lazy"}
-                          />
-                        ) : (
-                          <Typography
-                            sx={{ fontStyle: "italic", color: "gray", my: 2 }}
-                          >
-                            Image not available. There may have been an error in
-                            the forecast generation.
-                          </Typography>
-                        )}
-                      </div>
-                    </>
-                  )}
+                            : "Prophet"
+                        } Generated Data for Branch Creation`}
+                        loading={"lazy"}
+                      />
+                    ) : (
+                      <Typography
+                        sx={{ fontStyle: "italic", color: "gray", my: 2 }}
+                      >
+                        Image not available. There may have been an error in the
+                        forecast generation.
+                      </Typography>
+                    )}
+                  </div>
+                  <div>
+                    <Typography component="h4">
+                      All Data for Branch Creation
+                    </Typography>
+                    {githubRepoData?.branchesImageUrls
+                      ?.all_issues_data_image ? (
+                      <img
+                        src={
+                          githubRepoData?.branchesImageUrls
+                            ?.all_issues_data_image
+                        }
+                        alt={"All Data for Branch Creation"}
+                        loading={"lazy"}
+                      />
+                    ) : (
+                      <Typography
+                        sx={{ fontStyle: "italic", color: "gray", my: 2 }}
+                      >
+                        Image not available. There may have been an error in the
+                        forecast generation.
+                      </Typography>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Show Contributors tab content */}
+            {activeTab === "contributors" && (
+              <div>
+                {/* Render barchart component for contributors */}
+                <BarCharts
+                  title={`Monthly New Contributors for ${repository.value} in last 1 year`}
+                  data={githubRepoData?.contributors}
+                />
+                {/* Display total contributors count to verify pagination */}
+                <Typography
+                  variant="subtitle2"
+                  sx={{ textAlign: "right", mb: 1 }}
+                >
+                  Total contributors:{" "}
+                  {githubRepoData?.contributors?.reduce(
+                    (sum, item) => sum + item[1],
+                    0
+                  ) || 0}
+                </Typography>
+                <Divider
+                  sx={{ borderBlockWidth: "3px", borderBlockColor: "#FFA500" }}
+                />
+                {/* Rendering Timeseries Forecasting of Contributors */}
+                <div>
+                  <Typography variant="h5" component="div" gutterBottom>
+                    Timeseries Forecasting of New Contributors using{" "}
+                    {forecastModel === "lstm"
+                      ? "Tensorflow and Keras LSTM"
+                      : forecastModel === "statsmodel"
+                      ? "Statsmodels ARIMA"
+                      : "Prophet (Facebook)"}{" "}
+                    based on past month
+                  </Typography>
+
+                  <div>
+                    <Typography component="h4">
+                      Model{" "}
+                      {forecastModel === "lstm"
+                        ? "Loss"
+                        : forecastModel === "statsmodel"
+                        ? "Diagnostics"
+                        : "Diagnostics"}{" "}
+                      for New Contributors
+                    </Typography>
+                    {githubRepoData?.contributorsImageUrls
+                      ?.model_loss_image_url ? (
+                      <img
+                        src={
+                          githubRepoData?.contributorsImageUrls
+                            ?.model_loss_image_url
+                        }
+                        alt={`Model ${
+                          forecastModel === "lstm"
+                            ? "Loss"
+                            : forecastModel === "statsmodel"
+                            ? "Diagnostics"
+                            : "Diagnostics"
+                        } for New Contributors`}
+                        loading={"lazy"}
+                      />
+                    ) : (
+                      <Typography
+                        sx={{ fontStyle: "italic", color: "gray", my: 2 }}
+                      >
+                        Image not available. There may have been an error in the
+                        forecast generation.
+                      </Typography>
+                    )}
+                  </div>
+                  <div>
+                    <Typography component="h4">
+                      {forecastModel === "lstm"
+                        ? "LSTM"
+                        : forecastModel === "statsmodel"
+                        ? "Statsmodel"
+                        : "Prophet"}{" "}
+                      Generated Data for New Contributors
+                    </Typography>
+                    {githubRepoData?.contributorsImageUrls
+                      ?.lstm_generated_image_url ? (
+                      <img
+                        src={
+                          githubRepoData?.contributorsImageUrls
+                            ?.lstm_generated_image_url
+                        }
+                        alt={`${
+                          forecastModel === "lstm"
+                            ? "LSTM"
+                            : forecastModel === "statsmodel"
+                            ? "Statsmodel"
+                            : "Prophet"
+                        } Generated Data for New Contributors`}
+                        loading={"lazy"}
+                      />
+                    ) : (
+                      <Typography
+                        sx={{ fontStyle: "italic", color: "gray", my: 2 }}
+                      >
+                        Image not available. There may have been an error in the
+                        forecast generation.
+                      </Typography>
+                    )}
+                  </div>
+                  <div>
+                    <Typography component="h4">
+                      All Data for New Contributors
+                    </Typography>
+                    {githubRepoData?.contributorsImageUrls
+                      ?.all_issues_data_image ? (
+                      <img
+                        src={
+                          githubRepoData?.contributorsImageUrls
+                            ?.all_issues_data_image
+                        }
+                        alt={"All Data for New Contributors"}
+                        loading={"lazy"}
+                      />
+                    ) : (
+                      <Typography
+                        sx={{ fontStyle: "italic", color: "gray", my: 2 }}
+                      >
+                        Image not available. There may have been an error in the
+                        forecast generation.
+                      </Typography>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
