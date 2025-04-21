@@ -212,6 +212,7 @@ export default function Home() {
         <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3 }}>
           <Tab label="Issues" value="issues" />
           <Tab label="Pull Requests" value="pulls" />
+          <Tab label="Commits" value="commits" />
           {/* Add more tabs here in the future if needed */}
         </Tabs>
 
@@ -384,6 +385,17 @@ export default function Home() {
                   title={`Monthly Pull Requests for ${repository.value} in last 1 year`}
                   data={githubRepoData?.pulls}
                 />
+                {/* Display total pull requests count to verify pagination */}
+                <Typography
+                  variant="subtitle2"
+                  sx={{ textAlign: "right", mb: 1 }}
+                >
+                  Total pull requests:{" "}
+                  {githubRepoData?.pulls?.reduce(
+                    (sum, item) => sum + item[1],
+                    0
+                  ) || 0}
+                </Typography>
                 <Divider
                   sx={{ borderBlockWidth: "3px", borderBlockColor: "#FFA500" }}
                 />
@@ -434,6 +446,85 @@ export default function Home() {
                         githubRepoData?.pullsImageUrls?.all_issues_data_image
                       }
                       alt={"All Issues Data for Pull Requests"}
+                      loading={"lazy"}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Show Commits tab content */}
+            {activeTab === "commits" && (
+              <div>
+                {/* Render barchart component for commits */}
+                <BarCharts
+                  title={`Monthly Commits for ${repository.value} in last 1 year`}
+                  data={githubRepoData?.commits}
+                />
+                {/* Display total commits count to verify pagination */}
+                <Typography
+                  variant="subtitle2"
+                  sx={{ textAlign: "right", mb: 1 }}
+                >
+                  Total commits:{" "}
+                  {githubRepoData?.commits?.reduce(
+                    (sum, item) => sum + item[1],
+                    0
+                  ) || 0}
+                </Typography>
+                <Divider
+                  sx={{ borderBlockWidth: "3px", borderBlockColor: "#FFA500" }}
+                />
+                {/* Rendering Timeseries Forecasting of Commits */}
+                <div>
+                  <Typography variant="h5" component="div" gutterBottom>
+                    Timeseries Forecasting of Commits using{" "}
+                    {forecastModel === "lstm"
+                      ? "Tensorflow and Keras LSTM"
+                      : "Statsmodels ARIMA"}{" "}
+                    based on past month
+                  </Typography>
+
+                  <div>
+                    <Typography component="h4">
+                      Model {forecastModel === "lstm" ? "Loss" : "Diagnostics"}{" "}
+                      for Commits
+                    </Typography>
+                    <img
+                      src={
+                        githubRepoData?.commitsImageUrls?.model_loss_image_url
+                      }
+                      alt={`Model ${
+                        forecastModel === "lstm" ? "Loss" : "Diagnostics"
+                      } for Commits`}
+                      loading={"lazy"}
+                    />
+                  </div>
+                  <div>
+                    <Typography component="h4">
+                      {forecastModel === "lstm" ? "LSTM" : "Statsmodel"}{" "}
+                      Generated Data for Commits
+                    </Typography>
+                    <img
+                      src={
+                        githubRepoData?.commitsImageUrls
+                          ?.lstm_generated_image_url
+                      }
+                      alt={`${
+                        forecastModel === "lstm" ? "LSTM" : "Statsmodel"
+                      } Generated Data for Commits`}
+                      loading={"lazy"}
+                    />
+                  </div>
+                  <div>
+                    <Typography component="h4">
+                      All Issues Data for Commits
+                    </Typography>
+                    <img
+                      src={
+                        githubRepoData?.commitsImageUrls?.all_issues_data_image
+                      }
+                      alt={"All Issues Data for Commits"}
                       loading={"lazy"}
                     />
                   </div>
