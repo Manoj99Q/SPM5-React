@@ -215,6 +215,7 @@ export default function Home() {
           <Tab label="Commits" value="commits" />
           <Tab label="Branches" value="branches" />
           <Tab label="Contributors" value="contributors" />
+          <Tab label="Releases" value="releases" />
           {/* Add more tabs here in the future if needed */}
         </Tabs>
 
@@ -871,6 +872,189 @@ export default function Home() {
                     )}
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Show Releases tab content */}
+            {activeTab === "releases" && (
+              <div>
+                {githubRepoData?.releases &&
+                githubRepoData.releases.length > 0 ? (
+                  <>
+                    {/* Render barchart component for releases */}
+                    <BarCharts
+                      title={`Monthly Releases for ${repository.value} in last 1 year`}
+                      data={githubRepoData?.releases}
+                    />
+                    {/* Display total releases count to verify pagination */}
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ textAlign: "right", mb: 1 }}
+                    >
+                      Total releases:{" "}
+                      {githubRepoData?.releases?.reduce(
+                        (sum, item) => sum + item[1],
+                        0
+                      ) || 0}
+                    </Typography>
+                    <Divider
+                      sx={{
+                        borderBlockWidth: "3px",
+                        borderBlockColor: "#FFA500",
+                      }}
+                    />
+                    {/* Rendering Timeseries Forecasting of Releases */}
+                    <div>
+                      <Typography variant="h5" component="div" gutterBottom>
+                        Timeseries Forecasting of Releases using{" "}
+                        {forecastModel === "lstm"
+                          ? "Tensorflow and Keras LSTM"
+                          : forecastModel === "statsmodel"
+                          ? "Statsmodels ARIMA"
+                          : "Prophet (Facebook)"}{" "}
+                        based on past month
+                      </Typography>
+
+                      <div>
+                        <Typography component="h4">
+                          Model{" "}
+                          {forecastModel === "lstm"
+                            ? "Loss"
+                            : forecastModel === "statsmodel"
+                            ? "Diagnostics"
+                            : "Diagnostics"}{" "}
+                          for Releases
+                        </Typography>
+                        {githubRepoData?.releasesImageUrls
+                          ?.model_loss_image_url ? (
+                          <img
+                            src={
+                              githubRepoData?.releasesImageUrls
+                                ?.model_loss_image_url
+                            }
+                            alt={`Model ${
+                              forecastModel === "lstm"
+                                ? "Loss"
+                                : forecastModel === "statsmodel"
+                                ? "Diagnostics"
+                                : "Diagnostics"
+                            } for Releases`}
+                            loading={"lazy"}
+                          />
+                        ) : (
+                          <Typography
+                            sx={{ fontStyle: "italic", color: "gray", my: 2 }}
+                          >
+                            Image not available. There may have been an error in
+                            the forecast generation or insufficient data for
+                            analysis.
+                          </Typography>
+                        )}
+                      </div>
+                      <div>
+                        <Typography component="h4">
+                          {forecastModel === "lstm"
+                            ? "LSTM"
+                            : forecastModel === "statsmodel"
+                            ? "Statsmodel"
+                            : "Prophet"}{" "}
+                          Generated Data for Releases
+                        </Typography>
+                        {githubRepoData?.releasesImageUrls
+                          ?.lstm_generated_image_url ? (
+                          <img
+                            src={
+                              githubRepoData?.releasesImageUrls
+                                ?.lstm_generated_image_url
+                            }
+                            alt={`${
+                              forecastModel === "lstm"
+                                ? "LSTM"
+                                : forecastModel === "statsmodel"
+                                ? "Statsmodel"
+                                : "Prophet"
+                            } Generated Data for Releases`}
+                            loading={"lazy"}
+                          />
+                        ) : (
+                          <Typography
+                            sx={{ fontStyle: "italic", color: "gray", my: 2 }}
+                          >
+                            Image not available. There may have been an error in
+                            the forecast generation or insufficient data for
+                            analysis.
+                          </Typography>
+                        )}
+                      </div>
+                      <div>
+                        <Typography component="h4">
+                          All Data for Releases
+                        </Typography>
+                        {githubRepoData?.releasesImageUrls
+                          ?.all_issues_data_image ? (
+                          <img
+                            src={
+                              githubRepoData?.releasesImageUrls
+                                ?.all_issues_data_image
+                            }
+                            alt={"All Data for Releases"}
+                            loading={"lazy"}
+                          />
+                        ) : (
+                          <Typography
+                            sx={{ fontStyle: "italic", color: "gray", my: 2 }}
+                          >
+                            Image not available. There may have been an error in
+                            the forecast generation or insufficient data for
+                            analysis.
+                          </Typography>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  // Display a helpful message when there are no releases
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      my: 8,
+                      py: 4,
+                      border: "1px dashed #ccc",
+                      borderRadius: 2,
+                      bgcolor: "#f9f9f9",
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      color="text.secondary"
+                      gutterBottom
+                    >
+                      No Releases Found
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      align="center"
+                      sx={{ maxWidth: 600, mb: 2 }}
+                    >
+                      This repository ({repository.value}) doesn't have any
+                      releases published. Releases are used by developers to
+                      package and provide software to users.
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      align="center"
+                      sx={{ maxWidth: 600 }}
+                    >
+                      Try selecting a different repository from the sidebar or a
+                      different data type from the tabs above.
+                    </Typography>
+                  </Box>
+                )}
               </div>
             )}
           </div>
