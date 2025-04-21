@@ -235,6 +235,11 @@ export default function Home() {
               control={<Radio />}
               label="Statsmodel (ARIMA)"
             />
+            <FormControlLabel
+              value="prophet"
+              control={<Radio />}
+              label="Prophet (Facebook)"
+            />
           </RadioGroup>
         </FormControl>
 
@@ -265,13 +270,20 @@ export default function Home() {
                     Timeseries Forecasting of Created Issues using{" "}
                     {forecastModel === "lstm"
                       ? "Tensorflow and Keras LSTM"
-                      : "Statsmodels ARIMA"}{" "}
+                      : forecastModel === "statsmodel"
+                      ? "Statsmodels ARIMA"
+                      : "Prophet (Facebook)"}{" "}
                     based on past month
                   </Typography>
 
                   <div>
                     <Typography component="h4">
-                      Model {forecastModel === "lstm" ? "Loss" : "Diagnostics"}{" "}
+                      Model{" "}
+                      {forecastModel === "lstm"
+                        ? "Loss"
+                        : forecastModel === "statsmodel"
+                        ? "Diagnostics"
+                        : "Diagnostics"}{" "}
                       for Created Issues
                     </Typography>
                     <img
@@ -279,14 +291,22 @@ export default function Home() {
                         githubRepoData?.createdAtImageUrls?.model_loss_image_url
                       }
                       alt={`Model ${
-                        forecastModel === "lstm" ? "Loss" : "Diagnostics"
+                        forecastModel === "lstm"
+                          ? "Loss"
+                          : forecastModel === "statsmodel"
+                          ? "Diagnostics"
+                          : "Diagnostics"
                       } for Created Issues`}
                       loading={"lazy"}
                     />
                   </div>
                   <div>
                     <Typography component="h4">
-                      {forecastModel === "lstm" ? "LSTM" : "Statsmodel"}{" "}
+                      {forecastModel === "lstm"
+                        ? "LSTM"
+                        : forecastModel === "statsmodel"
+                        ? "Statsmodel"
+                        : "Prophet"}{" "}
                       Generated Data for Created Issues
                     </Typography>
                     <img
@@ -295,7 +315,11 @@ export default function Home() {
                           ?.lstm_generated_image_url
                       }
                       alt={`${
-                        forecastModel === "lstm" ? "LSTM" : "Statsmodel"
+                        forecastModel === "lstm"
+                          ? "LSTM"
+                          : forecastModel === "statsmodel"
+                          ? "Statsmodel"
+                          : "Prophet"
                       } Generated Data for Created Issues`}
                       loading={"lazy"}
                     />
@@ -326,13 +350,20 @@ export default function Home() {
                     Timeseries Forecasting of Closed Issues using{" "}
                     {forecastModel === "lstm"
                       ? "Tensorflow and Keras LSTM"
-                      : "Statsmodels ARIMA"}{" "}
+                      : forecastModel === "statsmodel"
+                      ? "Statsmodels ARIMA"
+                      : "Prophet (Facebook)"}{" "}
                     based on past month
                   </Typography>
 
                   <div>
                     <Typography component="h4">
-                      Model {forecastModel === "lstm" ? "Loss" : "Diagnostics"}{" "}
+                      Model{" "}
+                      {forecastModel === "lstm"
+                        ? "Loss"
+                        : forecastModel === "statsmodel"
+                        ? "Diagnostics"
+                        : "Diagnostics"}{" "}
                       for Closed Issues
                     </Typography>
                     <img
@@ -340,14 +371,22 @@ export default function Home() {
                         githubRepoData?.closedAtImageUrls?.model_loss_image_url
                       }
                       alt={`Model ${
-                        forecastModel === "lstm" ? "Loss" : "Diagnostics"
+                        forecastModel === "lstm"
+                          ? "Loss"
+                          : forecastModel === "statsmodel"
+                          ? "Diagnostics"
+                          : "Diagnostics"
                       } for Closed Issues`}
                       loading={"lazy"}
                     />
                   </div>
                   <div>
                     <Typography component="h4">
-                      {forecastModel === "lstm" ? "LSTM" : "Statsmodel"}{" "}
+                      {forecastModel === "lstm"
+                        ? "LSTM"
+                        : forecastModel === "statsmodel"
+                        ? "Statsmodel"
+                        : "Prophet"}{" "}
                       Generated Data for Closed Issues
                     </Typography>
                     <img
@@ -356,7 +395,11 @@ export default function Home() {
                           ?.lstm_generated_image_url
                       }
                       alt={`${
-                        forecastModel === "lstm" ? "LSTM" : "Statsmodel"
+                        forecastModel === "lstm"
+                          ? "LSTM"
+                          : forecastModel === "statsmodel"
+                          ? "Statsmodel"
+                          : "Prophet"
                       } Generated Data for Closed Issues`}
                       loading={"lazy"}
                     />
@@ -405,26 +448,41 @@ export default function Home() {
                     Timeseries Forecasting of Pull Requests using{" "}
                     {forecastModel === "lstm"
                       ? "Tensorflow and Keras LSTM"
-                      : "Statsmodels ARIMA"}{" "}
+                      : forecastModel === "statsmodel"
+                      ? "Statsmodels ARIMA"
+                      : "Prophet (Facebook)"}{" "}
                     based on past month
                   </Typography>
 
                   <div>
                     <Typography component="h4">
-                      Model {forecastModel === "lstm" ? "Loss" : "Diagnostics"}{" "}
+                      Model{" "}
+                      {forecastModel === "lstm"
+                        ? "Loss"
+                        : forecastModel === "statsmodel"
+                        ? "Diagnostics"
+                        : "Diagnostics"}{" "}
                       for Pull Requests
                     </Typography>
                     <img
                       src={githubRepoData?.pullsImageUrls?.model_loss_image_url}
                       alt={`Model ${
-                        forecastModel === "lstm" ? "Loss" : "Diagnostics"
+                        forecastModel === "lstm"
+                          ? "Loss"
+                          : forecastModel === "statsmodel"
+                          ? "Diagnostics"
+                          : "Diagnostics"
                       } for Pull Requests`}
                       loading={"lazy"}
                     />
                   </div>
                   <div>
                     <Typography component="h4">
-                      {forecastModel === "lstm" ? "LSTM" : "Statsmodel"}{" "}
+                      {forecastModel === "lstm"
+                        ? "LSTM"
+                        : forecastModel === "statsmodel"
+                        ? "Statsmodel"
+                        : "Prophet"}{" "}
                       Generated Data for Pull Requests
                     </Typography>
                     <img
@@ -432,7 +490,11 @@ export default function Home() {
                         githubRepoData?.pullsImageUrls?.lstm_generated_image_url
                       }
                       alt={`${
-                        forecastModel === "lstm" ? "LSTM" : "Statsmodel"
+                        forecastModel === "lstm"
+                          ? "LSTM"
+                          : forecastModel === "statsmodel"
+                          ? "Statsmodel"
+                          : "Prophet"
                       } Generated Data for Pull Requests`}
                       loading={"lazy"}
                     />
@@ -481,13 +543,20 @@ export default function Home() {
                     Timeseries Forecasting of Commits using{" "}
                     {forecastModel === "lstm"
                       ? "Tensorflow and Keras LSTM"
-                      : "Statsmodels ARIMA"}{" "}
+                      : forecastModel === "statsmodel"
+                      ? "Statsmodels ARIMA"
+                      : "Prophet (Facebook)"}{" "}
                     based on past month
                   </Typography>
 
                   <div>
                     <Typography component="h4">
-                      Model {forecastModel === "lstm" ? "Loss" : "Diagnostics"}{" "}
+                      Model{" "}
+                      {forecastModel === "lstm"
+                        ? "Loss"
+                        : forecastModel === "statsmodel"
+                        ? "Diagnostics"
+                        : "Diagnostics"}{" "}
                       for Commits
                     </Typography>
                     <img
@@ -495,14 +564,22 @@ export default function Home() {
                         githubRepoData?.commitsImageUrls?.model_loss_image_url
                       }
                       alt={`Model ${
-                        forecastModel === "lstm" ? "Loss" : "Diagnostics"
+                        forecastModel === "lstm"
+                          ? "Loss"
+                          : forecastModel === "statsmodel"
+                          ? "Diagnostics"
+                          : "Diagnostics"
                       } for Commits`}
                       loading={"lazy"}
                     />
                   </div>
                   <div>
                     <Typography component="h4">
-                      {forecastModel === "lstm" ? "LSTM" : "Statsmodel"}{" "}
+                      {forecastModel === "lstm"
+                        ? "LSTM"
+                        : forecastModel === "statsmodel"
+                        ? "Statsmodel"
+                        : "Prophet"}{" "}
                       Generated Data for Commits
                     </Typography>
                     <img
@@ -511,7 +588,11 @@ export default function Home() {
                           ?.lstm_generated_image_url
                       }
                       alt={`${
-                        forecastModel === "lstm" ? "LSTM" : "Statsmodel"
+                        forecastModel === "lstm"
+                          ? "LSTM"
+                          : forecastModel === "statsmodel"
+                          ? "Statsmodel"
+                          : "Prophet"
                       } Generated Data for Commits`}
                       loading={"lazy"}
                     />
